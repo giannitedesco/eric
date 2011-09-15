@@ -67,7 +67,7 @@ static int label_is_valid(char *ptr)
 	return 1;
 }
 
-static struct label *label_lookup(struct code_rom *rom, char *label)
+static struct label *label_lookup(struct code_rom *rom, const char *label)
 {
 	struct label *l;
 
@@ -296,6 +296,46 @@ static int op_halt(struct code_rom *rom, char *operands)
 	return emit_insn(rom, 0);
 }
 
+static int cbranch_op(struct code_rom *rom, uint8_t invert,
+			uint8_t zero, const char *label)
+{
+	struct label *l;
+	uint16_t insn;
+
+	invert = !!invert;
+	zero = !!zero;
+
+	l = label_lookup(rom, label);
+	if ( NULL == l ) {
+		fprintf(stderr, "%s:%u: label not found: %s\n",
+			rom->fn, rom->line, label);
+		return 0;
+	}
+
+	insn = (1 << 8) | (invert << 7) | (zero << 6) | l->addr;
+	return emit_insn(rom, insn);
+}
+
+static int op_jnz(struct code_rom *rom, char *operands)
+{
+	return cbranch_op(rom, 1, 1, operands);
+}
+
+static int op_jz(struct code_rom *rom, char *operands)
+{
+	return cbranch_op(rom, 0, 1, operands);
+}
+
+static int op_jnc(struct code_rom *rom, char *operands)
+{
+	return cbranch_op(rom, 1, 0, operands);
+}
+
+static int op_jc(struct code_rom *rom, char *operands)
+{
+	return cbranch_op(rom, 0, 0, operands);
+}
+
 static int dispatch_insn(struct code_rom *rom, char *insn, char *operands)
 {
 	static const struct {
@@ -310,6 +350,10 @@ static int dispatch_insn(struct code_rom *rom, char *insn, char *operands)
 		{"nopx", op_nopx},
 		{"nopy", op_nopy},
 		{"halt", op_halt},
+		{"jnz", op_jnz},
+		{"jz", op_jz},
+		{"jnc", op_jnc},
+		{"jc", op_jc},
 	};
 	unsigned int i;
 
