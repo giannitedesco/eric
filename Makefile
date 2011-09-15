@@ -1,5 +1,12 @@
 .SUFFIXES:
 
+ifeq ($(OS), win32)
+CROSS_COMPILE := i586-mingw32msvc-
+SUFFIX := .exe
+else
+SUFFIX := 
+endif
+
 CC := $(CROSS_COMPILE)gcc
 LD := $(CROSS_COMPILE)ld
 AR := $(CROSS_COMPILE)ar
@@ -19,10 +26,10 @@ CFLAGS := -g -pipe -O2 -Wall \
 	-Iinclude \
 	$(EXTRA_DEFS) 
 
-EMU_BIN := mcdump
+EMU_BIN := emu$(SUFFIX)
 EMU_OBJ := emu.o
 
-ASM_BIN := asm
+ASM_BIN := asm$(SUFFIX)
 ASM_OBJ := asm.o
 
 ALL_BIN := $(EMU_BIN) $(ASM_BIN)

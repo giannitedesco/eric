@@ -322,7 +322,7 @@ static int open_code_rom(struct cpu *cpu, FILE *f, const char *cmd)
 	size_t s;
 
 	s = fread(cpu->code_rom, 1, sizeof(cpu->code_rom), f);
-	printf("cpu: read %zu bytes of code\n", s);
+	printf("cpu: read %lu bytes of code\n", (unsigned long)s);
 
 	if ( ferror(f) ) {
 		fprintf(stderr, "%s: fread: %s\n", cmd, strerror(errno));
@@ -348,7 +348,7 @@ int main(int argc, char **argv)
 	if ( !open_code_rom(&cpu, f, argv[0]) )
 		return 0;
 
-	printf("cpu: state %zu bytes\n", sizeof(struct cpu));
+	printf("cpu: state %lu bytes\n", (unsigned long)sizeof(struct cpu));
 	cpu_reset(&cpu);
 
 	while(!cpu_halted(&cpu))

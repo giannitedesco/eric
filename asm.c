@@ -385,7 +385,7 @@ static int write_rom(struct code_rom *rom, FILE *f)
 		return 0;
 	}
 
-	printf("%zu insns successfuly written\n", sz);
+	printf("%lu insns successfuly written\n", (unsigned long)sz);
 	return 1;
 }
 
