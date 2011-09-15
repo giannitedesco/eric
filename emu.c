@@ -114,8 +114,8 @@ static void cpu_update_alu(struct cpu *cpu)
 
 	/* update output state */
 	cpu->carry = carry;
-	cpu->zero = (out == 0);
 	cpu->hold = out;
+	cpu->zero = (cpu->hold == 0);
 
 	printf(" + alu: %s %s, %s = 0x%.2x (%u) %scarry\n",
 		cpu_alu_name(cpu->alu_op),
@@ -141,9 +141,6 @@ static void cpu_wr_enable(struct cpu *cpu, uint8_t regs)
 			cpu->reg[i] = in;
 		}
 	}
-
-	/* alu state is reflected immediately on store */
-	cpu_update_alu(cpu);
 }
 
 /* select ALU operation */
@@ -191,8 +188,8 @@ static void cpu_op_condbranch(struct cpu *cpu, uint16_t op)
 	uint8_t zero;
 	uint8_t val;
 
-	invert = (op & (1 << 7));
-	zero = (op & (1 << 6));
+	invert = !!(op & (1 << 7));
+	zero = !!(op & (1 << 6));
 
 	printf(" cond-branch: if%s %s to 0x%.2x (%u)\n",
 		(op & (1 << 7)) ? " not" : "",
