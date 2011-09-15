@@ -361,7 +361,10 @@ static int assemble(struct code_rom *rom, FILE *f)
 		for(ptr = buf; isspace(*ptr); ptr++)
 			/* nothing */;
 
-		if ( *end == ':' ) {
+		if ( *ptr == '\0' || *ptr == ';' ) {
+			/* empty line or comment */
+			continue;
+		}else if ( *end == ':' ) {
 			*end = '\0';
 			if ( !add_label(rom, ptr) )
 				return 0;
