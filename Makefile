@@ -35,13 +35,15 @@ ASM_OBJ := asm.o
 ALL_BIN := $(EMU_BIN) $(ASM_BIN)
 ALL_OBJ := $(EMU_OBJ) $(ASM_OBJ)
 ALL_DEP := $(patsubst %.o, .%.d, $(ALL_OBJ))
-ALL_TARGETS := $(ALL_BIN)
+BINS := $(patsubst %.asm, %.bin, $(wildcard *.asm))
+ALL_TARGETS := $(ALL_BIN) $(BINS)
+
 
 TARGET: all
 
 .PHONY: all clean
 
-all: $(ALL_BIN)
+all: $(ALL_TARGETS)
 
 ifeq ($(filter clean, $(MAKECMDGOALS)),clean)
 CLEAN_DEP := clean
@@ -69,3 +71,7 @@ clean:
 ifneq ($(MAKECMDGOALS),clean)
 -include $(ALL_DEP)
 endif
+
+%.bin: %.asm $(ASM_BIN)
+	@echo " [ASM] $@"
+	@./$(ASM_BIN) $< $@
